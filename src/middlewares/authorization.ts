@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import config from '../config/jwt.config');
+import config from '../config/jwt.config';
+import { getCookie } from '../utils/helper';
 import HttpResponse from '../utils/response';
 
 const authAccessToken = (req: Request, res: Response, next: NextFunction) => {
@@ -14,29 +15,25 @@ const authAccessToken = (req: Request, res: Response, next: NextFunction) => {
             console.log(err);
             return response.unauthorized(res, 401, err.message);
         } else {
-            req.user = _;
+            req.currentUser = _;
             next();
         }
     });
 };
 
-const authRefreshToken = (req, res, next) => {
-    const refreshToken = req.headers.cookie.split('=');
-    console.log(refreshToken.length);
-    if (refreshToken.length != 2) {
-        return response.unauthorized('Unauthorized', res);
-    }
-    jwt.verify(refreshToken[1], config.refreshSecret, (err, _) => {
+const authRefreshToken = (req: Request, res: Response, next: NextFunction) => {
+    const response = new HttpResponse();
+    const refreshToken = getCookie(req.headers.cookie, 'refreshToken');
+    if (!refreshToken) return response.unauthorized(res, 401, `RefreshToken is required`);
+
+    jwt.verify(refreshToken, config.refreshSecret, (err, _) => {
         if (err) {
-            console.log(err);
-            return response.unauthorized(err.message || 'Unauthorized', res);
+            return response.unauthorized(res, 401, err.message || 'Unauthorized');
         } else {
+            req.currentUser = _;
             next();
         }
     });
 };
 
-module.exports = {
-    authAccessToken,
-    authRefreshToken,
-};
+export { authAccessToken, authRefreshToken };

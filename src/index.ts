@@ -7,6 +7,9 @@ import * as dotenv from 'dotenv';
 import db from './db';
 import cors from 'cors';
 import helmet from 'helmet';
+
+// routes
+import authRoute from './api/auth/auth.route';
 import userRoute from './api/user/user.route';
 
 dotenv.config();
@@ -40,3 +43,4 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api', userRoute);
+app.use('/api', authRoute);
