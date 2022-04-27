@@ -10,8 +10,8 @@ export default class HttpResponse {
     notFound = (res: any, flag: number = 404, message: string) =>
         res.status(flag).json({ success: false, flag, message });
 
-    invalidInput = (res: any, flag: number = 400, message: string) =>
-        res.status(flag).json({ success: false, flag, message });
+    invalidInput = (res: any, flag: number = 400, message: string, error: any) =>
+        res.status(flag).json({ success: false, flag, message, error });
 
     unauthorized = (res: any, flag: number = 401, message: string) =>
         res.status(flag).json({ success: false, flag, message });
